@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de URLs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        button {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+        ul {
+            padding-left: 1.2rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Guardar URL</h1>
+        <form id="url-form">
+            <input type="text" id="url" name="url" placeholder="Ingresa una URL" required>
+            <button type="submit">Enviar</button>
+        </form>
+        <h2>URLs guardadas</h2>
+        <ul id="url-list"></ul>
+    </div>
+
+    <script>
+        const form = document.getElementById('url-form');
+        const list = document.getElementById('url-list');
+
+        async function loadUrls() {
+            const response = await fetch('/urls');
+            const urls = await response.json();
+            list.innerHTML = '';
+
+            if (urls.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.textContent = 'No hay URLs guardadas aún.';
+                list.appendChild(emptyItem);
+                return;
+            }
+
+            urls.forEach((url) => {
+                const item = document.createElement('li');
+                item.textContent = url;
+                list.appendChild(item);
+            });
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/submit', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.status === 'ok') {
+                form.reset();
+                await loadUrls();
+            }
+        });
+
+        loadUrls();
+    </script>
+</body>
+</html>
