@@ -1,0 +1,11 @@
+# Dependencias y entornos
+venv/
+__pycache__/
+
+# Secretos
+.env
+
+# Bases de datos locales
+urls.db
+*.db
+*.sqlite
