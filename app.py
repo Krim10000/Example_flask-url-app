@@ -1,9 +1,17 @@
 import os
 import sqlite3
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
+
+load_dotenv()
 
 app = Flask(__name__)
 DB_PATH = os.path.join(os.path.dirname(__file__), "urls.db")
+
+frontend_url = os.getenv("FRONTEND_URL", "*")
+allowed_origins = [origin.strip() for origin in frontend_url.split(",") if origin.strip()]
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 
 def init_db():
@@ -58,4 +66,5 @@ def get_urls():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    port = int(os.getenv("PORT", "5000"))
+    app.run(debug=True, host="0.0.0.0", port=port)
